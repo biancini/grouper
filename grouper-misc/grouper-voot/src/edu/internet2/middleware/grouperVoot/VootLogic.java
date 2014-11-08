@@ -270,6 +270,7 @@ public class VootLogic {
           attr.setValues(curVal);
           attributes[i] = attr;
         }
+        vootPerson.setAttributes(attributes);
       }
       result[index] = vootPerson;
 
