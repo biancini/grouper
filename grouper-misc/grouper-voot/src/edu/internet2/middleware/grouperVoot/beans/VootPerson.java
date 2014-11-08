@@ -16,7 +16,9 @@
 
 package edu.internet2.middleware.grouperVoot.beans;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +47,8 @@ public class VootPerson {
   /** Email addresses e.g. jsmith@school.edu, johns@company.com */
   private VootEmail[] emails;
   
+  /** Additional parameters */
+  private VootAttribute[] attributes;
   /**
    * Default constructor. 
    */
@@ -92,9 +96,13 @@ public class VootPerson {
       if (!other.getId().equals(id)) return false;
       if (!other.getDisplayName().equals(displayName)) return false;
       
-      List<VootEmail> list1 = Arrays.asList(emails);
-      List<VootEmail> list2 = Arrays.asList(other.getEmails());
-      if (!list1.containsAll(list2) || !list2.containsAll(list1)) return false;
+      List<VootEmail> mailList1 = Arrays.asList(emails);
+      List<VootEmail> mailList2 = Arrays.asList(other.getEmails());
+      if (!mailList1.containsAll(mailList2) || !mailList2.containsAll(mailList1)) return false;
+      
+      List<VootAttribute> attributeList1 = Arrays.asList(emails);
+      List<VootAttribute> attributeList2 = Arrays.asList(other.getEmails());
+      if (!attributeList1.containsAll(attributeList2) || !attributeList2.containsAll(attributeList1)) return false;
       
       return true;
     }
@@ -174,4 +182,23 @@ public class VootPerson {
   public void setEmails(VootEmail[] emails1) {
     this.emails = emails1;
   }
+  
+  /**
+   * Get additional attributes.
+   * 
+   * @return the attributes.
+   */
+  public VootAttribute[] getAttributes() {
+    return attributes;
+  }
+
+  /**
+   * Set additional attributes (if any).
+   * 
+   * @param attributes1 the additional attributes map.
+   */
+  public void setAttributes(VootAttribute[] attributes1) {
+    this.attributes = attributes1;
+  }
+  
 }

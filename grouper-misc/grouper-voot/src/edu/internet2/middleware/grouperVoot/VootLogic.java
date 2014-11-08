@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.collections.keyvalue.MultiKey;
 
@@ -32,6 +34,9 @@ import edu.internet2.middleware.grouper.GroupFinder;
 import edu.internet2.middleware.grouper.GrouperSession;
 import edu.internet2.middleware.grouper.Member;
 import edu.internet2.middleware.grouper.MemberFinder;
+import edu.internet2.middleware.grouper.attr.assign.AttributeAssign;
+import edu.internet2.middleware.grouper.attr.assign.AttributeAssignMemberDelegate;
+import edu.internet2.middleware.grouper.attr.value.AttributeAssignValue;
 import edu.internet2.middleware.grouper.exception.GroupNotFoundException;
 import edu.internet2.middleware.grouper.group.TypeOfGroup;
 import edu.internet2.middleware.grouper.hibernate.AuditControl;
@@ -48,6 +53,7 @@ import edu.internet2.middleware.grouper.misc.E;
 import edu.internet2.middleware.grouper.privs.AccessPrivilege;
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouperClientExt.org.apache.commons.lang3.StringUtils;
+import edu.internet2.middleware.grouperVoot.beans.VootAttribute;
 import edu.internet2.middleware.grouperVoot.beans.VootGroup;
 import edu.internet2.middleware.grouperVoot.beans.VootPerson;
 import edu.internet2.middleware.grouperVoot.messages.VootGetGroupsResponse;
@@ -178,9 +184,25 @@ public class VootLogic {
     Set<Subject> admins = new HashSet<Subject>();
     Set<Subject> updaters = new HashSet<Subject>();
     
+    Map<MultiKey, Map<String, String[]>> memberAttributes = new HashMap<MultiKey, Map<String, String[]>>();
     Set<Member> members = group.getMembers();
+    AttributeAssignMemberDelegate.populateAttributeAssignments(members);
+    
     for (Member member : members) {
       memberSubjects.add(member.getSubject());
+      
+      if (member.getAttributeValueDelegate().getAllAttributeAssignsForCache() != null && member.getAttributeValueDelegate().getAllAttributeAssignsForCache().size() > 0) {
+        MultiKey memberMultiKey = new MultiKey(member.getSubject().getSourceId(), member.getSubject().getId());
+        Map<String, String[]> attributes = new HashMap<String, String[]>();
+        for (Entry<AttributeAssign, Set<AttributeAssignValue>> entry : member.getAttributeValueDelegate().getAllAttributeAssignsForCache().entrySet()) {
+          Set<String> values = new TreeSet<String>();
+          for (AttributeAssignValue attributeValue : entry.getValue()){
+            values.add(attributeValue.valueString());
+          }
+          attributes.put(entry.getKey().getAttributeDefNameId(), values.toArray(new String[0]));
+        }
+        memberAttributes.put(memberMultiKey, attributes);
+      }
       
       Set<Group> isAdminOf = member.getGroups(FieldFinder.find(Field.FIELD_NAME_ADMINS, true));
       if (isAdminOf.contains(group)) {
@@ -237,6 +259,18 @@ public class VootLogic {
       String role = memberToRole.get(multiKey);
       VootPerson vootPerson = new VootPerson(curSubject);
       vootPerson.setVoot_membership_role(role);
+      if (memberAttributes.get(multiKey) != null){
+        VootAttribute[] attributes = new VootAttribute[memberAttributes.get(multiKey).size()];
+        for (int i = 0; i < memberAttributes.get(multiKey).size(); ++i) {
+          String curKey = memberAttributes.get(multiKey).keySet().toArray(new String[0])[i];
+          String[] curVal = memberAttributes.get(multiKey).get(curKey);
+          
+          VootAttribute attr = new VootAttribute();
+          attr.setName(curKey);
+          attr.setValues(curVal);
+          attributes[i] = attr;
+        }
+      }
       result[index] = vootPerson;
 
       index++;
