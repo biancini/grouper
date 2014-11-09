@@ -42,10 +42,12 @@ import edu.internet2.middleware.subject.Subject;
  */
 public abstract class VootTest extends GrouperTest {
 
+  protected final static String STEM_NAME = "testVoot";
+  
   protected final static String[] GROUP_NAMES = {
-    "testVoot:group0", "testVoot:group1", "testVoot:group2", "testVoot:group3", "testVoot:group4",
-    "testVoot:group5", "testVoot:group6", "testVoot:group7", "testVoot:group8", "testVoot:group9",
-    "testVoot:group10", "testVoot:group11"
+    STEM_NAME + ":group0", STEM_NAME + ":group1", STEM_NAME + ":group2", STEM_NAME + ":group3", STEM_NAME + ":group4",
+    STEM_NAME + ":group5", STEM_NAME + ":group6", STEM_NAME + ":group7", STEM_NAME + ":group8", STEM_NAME + ":group9",
+    STEM_NAME + ":group10", STEM_NAME + ":group11"
   };
   
   protected final static String[] GROUP_DESCRIPTIONS = {
