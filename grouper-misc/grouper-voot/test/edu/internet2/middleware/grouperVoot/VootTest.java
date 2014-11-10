@@ -24,11 +24,13 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.internet2.middleware.grouper.helper.GrouperTest;
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouper.ws.util.GrouperServiceUtils;
+import edu.internet2.middleware.grouperVoot.beans.VootAttribute;
 import edu.internet2.middleware.grouperVoot.beans.VootGroup;
 import edu.internet2.middleware.grouperVoot.beans.VootPerson;
 import edu.internet2.middleware.grouperVoot.messages.VootErrorResponse;
@@ -42,10 +44,12 @@ import edu.internet2.middleware.subject.Subject;
  */
 public abstract class VootTest extends GrouperTest {
 
+  protected final static String STEM_NAME = "testVoot";
+  
   protected final static String[] GROUP_NAMES = {
-    "testVoot:group0", "testVoot:group1", "testVoot:group2", "testVoot:group3", "testVoot:group4",
-    "testVoot:group5", "testVoot:group6", "testVoot:group7", "testVoot:group8", "testVoot:group9",
-    "testVoot:group10", "testVoot:group11"
+    STEM_NAME + ":group0", STEM_NAME + ":group1", STEM_NAME + ":group2", STEM_NAME + ":group3", STEM_NAME + ":group4",
+    STEM_NAME + ":group5", STEM_NAME + ":group6", STEM_NAME + ":group7", STEM_NAME + ":group8", STEM_NAME + ":group9",
+    STEM_NAME + ":group10", STEM_NAME + ":group11"
   };
   
   protected final static String[] GROUP_DESCRIPTIONS = {
@@ -276,6 +280,7 @@ public abstract class VootTest extends GrouperTest {
       for (int i = 0; i < subjectCount; ++i) {
         VootPerson vootPerson = new VootPerson(subjects[i]);
         vootPerson.setVoot_membership_role(roles[i]);
+        vootPerson.setAttributes(null);
         
         if (membersList.contains(vootPerson)) memberCount++;
       }
@@ -300,6 +305,46 @@ public abstract class VootTest extends GrouperTest {
         catch (Exception e) {
           assertTrue("Exception in checking sort", false);
         }
+      }
+    }
+  }
+  
+  /**
+   * Method to validate member attribute result from VOOT call.
+   * @param vootPerson the person returned from VOOT call.
+   * @param attributeValues the map of attributes name and values.
+   */
+  protected void validateMemberAttributes(VootPerson vootPerson, Map<String, String[]> attributeValues) {
+    if (vootPerson.getAttributes() == null) {
+      assertNull(attributeValues);
+    }
+    else {
+      for (Entry<String, String[]> curAttribute : attributeValues.entrySet()) {
+        VootAttribute newAttribute = new VootAttribute();
+        newAttribute.setName(curAttribute.getKey());
+        newAttribute.setValues(curAttribute.getValue());
+        
+        assertTrue(Arrays.asList(vootPerson.getAttributes()).contains(newAttribute));
+      }
+    }
+  }
+  
+  /**
+   * Method to validate member attribute result from VOOT call.
+   * @param vootGroup the group returned from VOOT call.
+   * @param attributeValues the map of attributes name and values.
+   */
+  protected void validateGroupAttributes(VootGroup vootGroup, Map<String, String[]> attributeValues) {
+    if (vootGroup.getAttributes() == null) {
+      assertNull(attributeValues);
+    }
+    else {
+      for (Entry<String, String[]> curAttribute : attributeValues.entrySet()) {
+        VootAttribute newAttribute = new VootAttribute();
+        newAttribute.setName(curAttribute.getKey());
+        newAttribute.setValues(curAttribute.getValue());
+        
+        assertTrue(Arrays.asList(vootGroup.getAttributes()).contains(newAttribute));
       }
     }
   }

@@ -45,6 +45,7 @@ public class AllVootTests extends GrouperTest {
     TestSuite suite = new TestSuite("Test for edu.internet2.middleware.grouperVoot");
 
     suite.addTestSuite(VootServiceLogicTest.class);
+    suite.addTestSuite(VootAdditionalAttributesTest.class);
     suite.addTestSuite(VootParamsLogicTest.class);
     suite.addTestSuite(VootErrorsTest.class);
     
