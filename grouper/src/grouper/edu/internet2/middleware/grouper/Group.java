@@ -3695,12 +3695,31 @@ public class Group extends GrouperAPI implements Role, GrouperHasContext, Owner,
   public Stem getParentStem() 
     throws  IllegalStateException
   {
-    String uuid = this.getParentUuid();
+    final String uuid = this.getParentUuid();
     if (uuid == null) {
       throw new IllegalStateException("group has no parent stem");
     }
     try {
-      Stem parent = GrouperDAOFactory.getFactory().getStem().findByUuid(uuid, true) ;
+      //try in transaction
+      Stem parent = GrouperDAOFactory.getFactory().getStem().findByUuid(uuid, false) ;
+      
+      if (parent == null) {
+        //try out of transaction
+        parent = (Stem)GrouperTransaction.callbackGrouperTransaction(GrouperTransactionType.NONE, new GrouperTransactionHandler() {
+          
+          public Object callback(GrouperTransaction grouperTransaction)
+              throws GrouperDAOException {
+            return GrouperDAOFactory.getFactory().getStem().findByUuid(uuid, true);
+          }
+        });
+        
+        if (parent != null) {
+          
+          //wait a bit for it to be available in this transaction
+          GrouperUtil.sleep(2000);
+          
+        }
+      }
       return parent;
     }
     catch (StemNotFoundException eShouldNeverHappen) {
@@ -6277,11 +6296,13 @@ public class Group extends GrouperAPI implements Role, GrouperHasContext, Owner,
               ChangeLogLabels.GROUP_UPDATE.parentStemId.name(), this.getParentUuid(),
               ChangeLogLabels.GROUP_UPDATE.displayName.name(), this.getDisplayName(),
               ChangeLogLabels.GROUP_UPDATE.description.name(), this.getDescription()),
-          GrouperUtil.toList(FIELD_NAME, FIELD_PARENT_UUID, FIELD_DESCRIPTION, FIELD_DISPLAY_EXTENSION),
+          GrouperUtil.toList(FIELD_NAME, FIELD_PARENT_UUID, FIELD_DESCRIPTION, FIELD_DISPLAY_EXTENSION, FIELD_DISPLAY_NAME),
           GrouperUtil.toList(ChangeLogLabels.GROUP_UPDATE.name.name(),
               ChangeLogLabels.GROUP_UPDATE.parentStemId.name(), 
               ChangeLogLabels.GROUP_UPDATE.description.name(), 
-              ChangeLogLabels.GROUP_UPDATE.displayExtension.name()));    
+              ChangeLogLabels.GROUP_UPDATE.displayExtension.name(),
+              ChangeLogLabels.GROUP_UPDATE.displayName.name()
+              ));    
       
     }
   }
