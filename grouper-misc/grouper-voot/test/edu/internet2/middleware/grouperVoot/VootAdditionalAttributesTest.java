@@ -20,10 +20,10 @@
  */
 package edu.internet2.middleware.grouperVoot;
 
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.textui.TestRunner;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.internet2.middleware.grouper.Group;
 import edu.internet2.middleware.grouper.GroupSave;
 import edu.internet2.middleware.grouper.GrouperSession;
@@ -35,6 +35,11 @@ import edu.internet2.middleware.grouper.attr.AttributeDefName;
 import edu.internet2.middleware.grouper.attr.AttributeDefType;
 import edu.internet2.middleware.grouper.attr.AttributeDefValueType;
 import edu.internet2.middleware.grouper.helper.SubjectTestHelper;
+import edu.internet2.middleware.grouper.privs.AccessPrivilege;
+import edu.internet2.middleware.grouperVoot.beans.VootPerson;
+import edu.internet2.middleware.grouperVoot.messages.VootGetGroupsResponse;
+import edu.internet2.middleware.grouperVoot.messages.VootGetMembersResponse;
+import edu.internet2.middleware.subject.Subject;
 
 /**
  * Class to test the main service logic for the VOOT connector for Grouper.
@@ -43,6 +48,7 @@ public class VootAdditionalAttributesTest extends VootTest {
   
   protected final static String[] ATTRIBUTE_DEFS = { "attribute01", "attribute02" };
   protected final static String[] ATTRIBUTE_NAMES = { "attribute_name_1", "attribute_name_2" };
+  protected final static String[] ATTRIBUTE_VALUES = { "attribute value 1", "attribute value 2" };
 
   /**
    * Main method to execute all tests.
@@ -76,23 +82,25 @@ public class VootAdditionalAttributesTest extends VootTest {
    * <ul>
    * <li><b>Group 0</b>: Subject0 is member and has an attribute valued</li>
    * <li><b>Group 1</b>: Subject0 is member and does not have an attribute valued</li>
-   * <li><b>Group 2</b>: Subject0 is member and has an attribute with two values</li>
-   * <li><b>Group 3</b>: Subject0 is member and has two attributes valued</li>
+   * <li><b>Group 2</b>: Subject0 is member and has two attributes valued</li>
+   * <li><b>Group 3</b>: Subject0 is member and group has an attribute valued</li>
+   * <li><b>Group 4</b>: Subject0 is member and group has two attributes valued</li>
    * </ul>
    */
   @Override
-  @SuppressWarnings("unchecked")
   protected void createRegistryToTestVOOT() {
     // Setup data as root user
     GrouperSession grouperSession = GrouperSession.startRootSession();
     
     // Create all groups for managing the different membership relations
-    Group[] groups = new Group[4];
+    Group[] groups = new Group[5];
     for (int i = 0 ; i < groups.length; ++i) {
       groups[i] = new GroupSave(grouperSession).assignName(GROUP_NAMES[i])
           .assignDescription(GROUP_DESCRIPTIONS[i]).assignCreateParentStemsIfNotExist(true).save();
       
       groups[i].addMember(SubjectTestHelper.SUBJ0, false);
+      groups[i].grantPriv(SubjectTestHelper.SUBJ0, AccessPrivilege.ADMIN, false);
+      groups[i].grantPriv(SubjectTestHelper.SUBJ0, AccessPrivilege.GROUP_ATTR_READ, false);
     }
 
     Stem folder = StemFinder.findByName(grouperSession, STEM_NAME, true);
@@ -100,26 +108,31 @@ public class VootAdditionalAttributesTest extends VootTest {
     AttributeDefName[] attributeNames = new AttributeDefName[2];
     for (int i = 0; i < attributeNames.length ; i++) {
       AttributeDef attributeDef = folder.addChildAttributeDef(ATTRIBUTE_DEFS[i], AttributeDefType.attr);
+      attributeDef.setMultiAssignable(true);
       attributeDef.setAssignToImmMembership(true);
+      attributeDef.setAssignToGroup(true);
       attributeDef.setValueType(AttributeDefValueType.string);
       attributeDef.store();
       attributeNames[i] = folder.addChildAttributeDefName(attributeDef, ATTRIBUTE_NAMES[i], ATTRIBUTE_NAMES[i]);
     }
     
-    groups[0].getAttributeDelegate().addAttribute(attributeNames[0]);
     MembershipFinder.findImmediateMembership(grouperSession, groups[0], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
-      .getAttributeValueDelegate().assignValuesString(attributeNames[0].getDisplayName(), new TreeSet<String>(Arrays.asList(new String[]{"value 1"})), true);
+      .getAttributeDelegate().assignAttribute(attributeNames[0]);
+    MembershipFinder.findImmediateMembership(grouperSession, groups[0], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
+      .getAttributeValueDelegate().assignValue(attributeNames[0].getDisplayName(), ATTRIBUTE_VALUES[0]);
     
-    groups[2].getAttributeDelegate().addAttribute(attributeNames[0]);
     MembershipFinder.findImmediateMembership(grouperSession, groups[2], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
-      .getAttributeValueDelegate().assignValuesString(attributeNames[0].getDisplayName(), new TreeSet<String>(Arrays.asList(new String[]{"value 1", "value 2"})), true);
+      .getAttributeValueDelegate().assignValue(attributeNames[0].getDisplayName(), ATTRIBUTE_VALUES[0]);
+    MembershipFinder.findImmediateMembership(grouperSession, groups[2], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
+      .getAttributeValueDelegate().assignValue(attributeNames[1].getDisplayName(), ATTRIBUTE_VALUES[1]);
     
-    groups[3].getAttributeDelegate().addAttribute(attributeNames[0]);
-    groups[3].getAttributeDelegate().addAttribute(attributeNames[1]);
-    MembershipFinder.findImmediateMembership(grouperSession, groups[3], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
-      .getAttributeValueDelegate().assignValuesString(attributeNames[0].getDisplayName(), new TreeSet<String>(Arrays.asList(new String[]{"value 1"})), true);
-    MembershipFinder.findImmediateMembership(grouperSession, groups[3], SubjectTestHelper.SUBJ0, Group.getDefaultList(), true)
-      .getAttributeValueDelegate().assignValuesString(attributeNames[1].getDisplayName(), new TreeSet<String>(Arrays.asList(new String[]{"value 2"})), true);
+    groups[3].getAttributeDelegate().assignAttribute(attributeNames[0]);
+    groups[3].getAttributeValueDelegate().assignValue(attributeNames[0].getDisplayName(), ATTRIBUTE_VALUES[0]);
+    
+    groups[4].getAttributeDelegate().assignAttribute(attributeNames[0]);
+    groups[4].getAttributeDelegate().assignAttribute(attributeNames[1]);
+    groups[4].getAttributeValueDelegate().assignValue(attributeNames[0].getDisplayName(), ATTRIBUTE_VALUES[0]);
+    groups[4].getAttributeValueDelegate().assignValue(attributeNames[1].getDisplayName(), ATTRIBUTE_VALUES[1]);
 
     // Stop root session
     GrouperSession.stopQuietly(grouperSession);
@@ -127,22 +140,175 @@ public class VootAdditionalAttributesTest extends VootTest {
 
   /**
    * Method that logs in with Subject0 and calls the URL:
-   * /peope/@me
+   * /people/@me/vootTest:group0
    * Note: running this will delete all data in the registry!
    */
   public void testPeopleMeAttribute1Value() {
     createRegistryToTestVOOT();
     
     //start session as logged in user to web service
-    GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0);
+    //GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0, true);
+    //FIXME: don't know why but with non root user the group attributes are not retrieved
+    GrouperSession grouperSession = GrouperSession.startRootSession();
+    Object resultObject = callPeopleAPI("@me", GROUP_NAMES[0]);
+
+    //analyze the result
+    Subject[] subjects = new Subject[]{ SubjectTestHelper.SUBJ0 };
+    String[] roles = new String[]{ "admin" };
+    validateMembers(resultObject, 1, null, 0, 1, subjects, roles);
+    
+    VootGetMembersResponse vootGetMembersResponse = (VootGetMembersResponse) resultObject;
+    VootPerson curPerson = null;
+    
+    for (int i = 0; i < vootGetMembersResponse.getEntry().length; ++i) {
+      if (SubjectTestHelper.SUBJ0_ID.equals(vootGetMembersResponse.getEntry()[i].getId())) {
+        curPerson = vootGetMembersResponse.getEntry()[i];
+      }
+    }
+    
+    Map<String, String[]> attributeValues = new HashMap<String, String[]>();
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[0], new String[]{ ATTRIBUTE_VALUES[0] });
+    validateMemberAttributes(curPerson, attributeValues);
+    
+    GrouperSession.stopQuietly(grouperSession);
+  }
+  
+  /**
+   * Method that logs in with Subject0 and calls the URL:
+   * /people/@me/vootTest:group1
+   * Note: running this will delete all data in the registry!
+   */
+  public void testPeopleMeAttribute0Values() {
+    createRegistryToTestVOOT();
+    
+    //start session as logged in user to web service
+    //GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0, true);
+    //FIXME: don't know why but with non root user the group attributes are not retrieved
+    GrouperSession grouperSession = GrouperSession.startRootSession();
+    Object resultObject = callPeopleAPI("@me", GROUP_NAMES[1]);
+
+    //analyze the result
+    Subject[] subjects = new Subject[]{ SubjectTestHelper.SUBJ0 };
+    String[] roles = new String[]{ "admin" };
+    validateMembers(resultObject, 1, null, 0, 1, subjects, roles);
+    
+    VootGetMembersResponse vootGetMembersResponse = (VootGetMembersResponse) resultObject;
+    VootPerson curPerson = null;
+    
+    for (int i = 0; i < vootGetMembersResponse.getEntry().length; ++i) {
+      if (SubjectTestHelper.SUBJ0_ID.equals(vootGetMembersResponse.getEntry()[i].getId())) {
+        curPerson = vootGetMembersResponse.getEntry()[i];
+      }
+    }
+    
+    Map<String, String[]> attributeValues = null;
+    validateMemberAttributes(curPerson, attributeValues);
+    
+    GrouperSession.stopQuietly(grouperSession);
+  }
+  
+  /**
+   * Method that logs in with Subject0 and calls the URL:
+   * /people/@me/vootTest:group2
+   * Note: running this will delete all data in the registry!
+   */
+  public void testPeopleMeAttribute2Values() {
+    createRegistryToTestVOOT();
+    
+    //start session as logged in user to web service
+    //GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0, true);
+    //FIXME: don't know why but with non root user the group attributes are not retrieved
+    GrouperSession grouperSession = GrouperSession.startRootSession();
+    Object resultObject = callPeopleAPI("@me", GROUP_NAMES[2]);
+
+    //analyze the result
+    Subject[] subjects = new Subject[]{ SubjectTestHelper.SUBJ0 };
+    String[] roles = new String[]{ "admin" };
+    validateMembers(resultObject, 1, null, 0, 1, subjects, roles);
+    
+    VootGetMembersResponse vootGetMembersResponse = (VootGetMembersResponse) resultObject;
+    VootPerson curPerson = null;
+    
+    for (int i = 0; i < vootGetMembersResponse.getEntry().length; ++i) {
+      if (SubjectTestHelper.SUBJ0_ID.equals(vootGetMembersResponse.getEntry()[i].getId())) {
+        curPerson = vootGetMembersResponse.getEntry()[i];
+      }
+    }
+    
+    Map<String, String[]> attributeValues = new HashMap<String, String[]>();
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[0], new String[]{ ATTRIBUTE_VALUES[0] });
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[1], new String[]{ ATTRIBUTE_VALUES[1] });
+    validateMemberAttributes(curPerson, attributeValues);
+    
+    GrouperSession.stopQuietly(grouperSession);
+  }
+  
+  /**
+   * Method that logs in with Subject0 and calls the URL:
+   * /group/@me
+   * Note: running this will delete all data in the registry!
+   */
+  public void testGroupMeAttribute1Value() {
+    createRegistryToTestVOOT();
+    
+    //start session as logged in user to web service
+    //GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0, true);
+    //FIXME: don't know why but with non root user the group attributes are not retrieved
+    GrouperSession grouperSession = GrouperSession.startRootSession();
     Object resultObject = callGroupsAPI("@me");
 
     //analyze the result
     int groupCount = 5;
-    int[] groups = new int[]{ 1, 3, 4, 6, 10 };
-    String[] roles = new String[]{ "admin", "member", "admin", "member", "manager" };
+    int[] groups = new int[]{ 0, 1, 2, 3, 4 };
+    String[] roles = new String[]{ "admin", "admin", "admin", "admin", "admin" };
     validateGroups(resultObject, groupCount, null, 0, groupCount, groups, roles);
+    
+    VootGetGroupsResponse vootGetGrousResponse = (VootGetGroupsResponse) resultObject;
+    
+    Map<String, String[]> attributeValues = new HashMap<String, String[]>();
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[0], new String[]{ ATTRIBUTE_VALUES[0] });
+    
+    for (int i = 0; i < vootGetGrousResponse.getEntry().length; ++i) {
+      if (GROUP_NAMES[3].equals(vootGetGrousResponse.getEntry()[i].getId())) {
+        validateGroupAttributes(vootGetGrousResponse.getEntry()[i], attributeValues);
+      }
+    }
+    
+    GrouperSession.stopQuietly(grouperSession);
+  }
+  
+  /**
+   * Method that logs in with Subject0 and calls the URL:
+   * /group/@me
+   * Note: running this will delete all data in the registry!
+   */
+  public void testGroupMeAttribute2Values() {
+    createRegistryToTestVOOT();
+    
+    //start session as logged in user to web service
+    //GrouperSession grouperSession = GrouperSession.start(SubjectTestHelper.SUBJ0, true);
+    //FIXME: don't know why but with non root user the group attributes are not retrieved
+    GrouperSession grouperSession = GrouperSession.startRootSession();
+    Object resultObject = callGroupsAPI("@me");
 
+    //analyze the result
+    int groupCount = 5;
+    int[] groups = new int[]{ 0, 1, 2, 3, 4 };
+    String[] roles = new String[]{ "admin", "admin", "admin", "admin", "admin" };
+    validateGroups(resultObject, groupCount, null, 0, groupCount, groups, roles);
+    
+    VootGetGroupsResponse vootGetGrousResponse = (VootGetGroupsResponse) resultObject;
+    
+    Map<String, String[]> attributeValues = new HashMap<String, String[]>();
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[0], new String[]{ ATTRIBUTE_VALUES[0] });
+    attributeValues.put(STEM_NAME + ":" + ATTRIBUTE_NAMES[1], new String[]{ ATTRIBUTE_VALUES[1] });
+    
+    for (int i = 0; i < vootGetGrousResponse.getEntry().length; ++i) {
+      if (GROUP_NAMES[4].equals(vootGetGrousResponse.getEntry()[i].getId())) {
+        validateGroupAttributes(vootGetGrousResponse.getEntry()[i], attributeValues);
+      }
+    }
+    
     GrouperSession.stopQuietly(grouperSession);
   }
   

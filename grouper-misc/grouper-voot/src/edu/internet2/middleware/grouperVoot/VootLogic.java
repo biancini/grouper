@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -34,9 +33,12 @@ import edu.internet2.middleware.grouper.GroupFinder;
 import edu.internet2.middleware.grouper.GrouperSession;
 import edu.internet2.middleware.grouper.Member;
 import edu.internet2.middleware.grouper.MemberFinder;
+import edu.internet2.middleware.grouper.Membership;
+import edu.internet2.middleware.grouper.MembershipFinder;
 import edu.internet2.middleware.grouper.attr.assign.AttributeAssign;
 import edu.internet2.middleware.grouper.attr.assign.AttributeAssignMemberDelegate;
-import edu.internet2.middleware.grouper.attr.value.AttributeAssignValue;
+import edu.internet2.middleware.grouper.attr.assign.AttributeAssignMembershipDelegate;
+import edu.internet2.middleware.grouper.attr.value.AttributeValueDelegate;
 import edu.internet2.middleware.grouper.exception.GroupNotFoundException;
 import edu.internet2.middleware.grouper.group.TypeOfGroup;
 import edu.internet2.middleware.grouper.hibernate.AuditControl;
@@ -191,16 +193,23 @@ public class VootLogic {
     for (Member member : members) {
       memberSubjects.add(member.getSubject());
       
-      if (member.getAttributeValueDelegate().getAllAttributeAssignsForCache() != null && member.getAttributeValueDelegate().getAllAttributeAssignsForCache().size() > 0) {
+      Membership membership = MembershipFinder.findImmediateMembership(grouperSession, group, member.getSubject(), Group.getDefaultList(), true);
+      AttributeAssignMembershipDelegate membershipAttributeDelegate =  membership.getAttributeDelegate();
+      AttributeValueDelegate attributeValueDelegate = membership.getAttributeValueDelegate();
+      
+      if (membershipAttributeDelegate.getAttributeAssigns().size() > 0) {
         MultiKey memberMultiKey = new MultiKey(member.getSubject().getSourceId(), member.getSubject().getId());
+        
         Map<String, String[]> attributes = new HashMap<String, String[]>();
-        for (Entry<AttributeAssign, Set<AttributeAssignValue>> entry : member.getAttributeValueDelegate().getAllAttributeAssignsForCache().entrySet()) {
+        for (AttributeAssign attributeAssign : membershipAttributeDelegate.getAttributeAssigns()) {
           Set<String> values = new TreeSet<String>();
-          for (AttributeAssignValue attributeValue : entry.getValue()){
-            values.add(attributeValue.valueString());
+          
+          for (String attributeValue : attributeValueDelegate.retrieveValuesString(attributeAssign.getAttributeDefName().getName())){
+            values.add(attributeValue);
           }
-          attributes.put(entry.getKey().getAttributeDefNameId(), values.toArray(new String[0]));
+          attributes.put(attributeAssign.getAttributeDefName().getName(), values.toArray(new String[0]));
         }
+        
         memberAttributes.put(memberMultiKey, attributes);
       }
       

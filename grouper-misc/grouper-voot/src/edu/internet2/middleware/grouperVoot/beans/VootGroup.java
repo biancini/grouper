@@ -16,7 +16,11 @@
 
 package edu.internet2.middleware.grouperVoot.beans;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import edu.internet2.middleware.grouper.Group;
+import edu.internet2.middleware.grouper.attr.assign.AttributeAssign;
 
 /**
  * VOOT group bean that gets transformed to json.
@@ -34,6 +38,9 @@ public class VootGroup {
 
   /** Description of group */
   private String description;
+  
+  /** Additional parameters */
+  private VootAttribute[] attributes;
 
   /** VOOT memebershib role being "manager", "admin" or "member". */
   private String voot_membership_role;
@@ -54,6 +61,24 @@ public class VootGroup {
     this.setId(group.getName());
     this.setName(group.getDisplayName());
     this.setDescription(group.getDescription());
+    
+    if (group.getAttributeDelegate().getAttributeAssigns().size() > 0) {
+      attributes = new VootAttribute[group.getAttributeDelegate().getAttributeAssigns().size()];
+      int i = 0;
+      
+      for (AttributeAssign attributeAssign : group.getAttributeDelegate().getAttributeAssigns()) {
+        Set<String> values = new TreeSet<String>();
+        
+        for (String attributeValue : group.getAttributeValueDelegate().retrieveValuesString(attributeAssign.getAttributeDefName().getName())){
+          values.add(attributeValue);
+        }
+        
+        attributes[i] = new VootAttribute();
+        attributes[i].setName(attributeAssign.getAttributeDefName().getName());
+        attributes[i].setValues(values.toArray(new String[0]));
+        i++;
+      }
+    }
   }
   
   /**
@@ -145,6 +170,24 @@ public class VootGroup {
    */
   public void setDescription(String description1) {
     this.description = description1;
+  }
+  
+  /**
+   * Get additional attributes.
+   * 
+   * @return the attributes.
+   */
+  public VootAttribute[] getAttributes() {
+    return attributes;
+  }
+
+  /**
+   * Set additional attributes (if any).
+   * 
+   * @param attributes1 the additional attributes map.
+   */
+  public void setAttributes(VootAttribute[] attributes1) {
+    this.attributes = attributes1;
   }
   
   /**

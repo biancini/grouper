@@ -97,10 +97,10 @@ public class VootPerson {
       List<VootEmail> mailList1 = Arrays.asList(emails);
       List<VootEmail> mailList2 = Arrays.asList(other.getEmails());
       if (!mailList1.containsAll(mailList2) || !mailList2.containsAll(mailList1)) return false;
-      
-      List<VootAttribute> attributeList1 = Arrays.asList(emails);
-      List<VootAttribute> attributeList2 = Arrays.asList(other.getEmails());
-      if (!attributeList1.containsAll(attributeList2) || !attributeList2.containsAll(attributeList1)) return false;
+
+      //List<VootAttribute> attributeList1 = Arrays.asList(attributes);
+      //List<VootAttribute> attributeList2 = Arrays.asList(other.getAttributes());
+      //if (!attributeList1.containsAll(attributeList2) || !attributeList2.containsAll(attributeList1)) return false;
       
       return true;
     }
