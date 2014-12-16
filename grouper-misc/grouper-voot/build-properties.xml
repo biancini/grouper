@@ -1,0 +1,11 @@
+<project name="build-properties">
+
+	<property name="project.dir" value="."/>
+	<property name="build.outdir" value="${project.dir}/bin" />
+	<property name="compile.outdir" value="${build.outdir}/classes" />
+	<property name="src.dir" value="${project.dir}/src" />
+	<property name="test.src.dir" value="${project.dir}/test" />
+	<property name="buildtools.dir" value="."/>
+	<property name="emma.enabled" value="true"/>
+	
+</project>

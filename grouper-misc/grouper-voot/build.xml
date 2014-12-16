@@ -55,6 +55,23 @@
       </fileset>
     </path>
 
+    <path id="project.classpath">
+      <fileset dir="${basedir}/dist">
+        <include name="**/*.jar" />
+      </fileset>
+    </path>
+
+    <path id="test.classpath">
+      <path refid="main.classpath"/>
+      <path refid="project.classpath"/>
+      <fileset dir="${grouper.dir}/dist/lib/test">
+        <include name="**/*.jar" />
+      </fileset>
+      <pathelement location="${grouper.dir}/conf"/>
+      <pathelement location="${main.binDir}"/>
+      <pathelement location="${build.dir.test}"/>
+    </path>
+
     <condition property="main.os" value="windows">
       <os family="windows" />
     </condition>
@@ -63,6 +80,7 @@
     </condition>
 
     <pathconvert targetos="${main.os}" property="main.theClasspath" refid="main.classpath" />
+    <pathconvert targetos="${main.os}" property="test.theClasspath" refid="test.classpath" />
     
   </target>
 
@@ -79,6 +97,29 @@
 
     <javac  target="1.6"
       srcdir="${main.sourceDir}" destdir="${main.binDir}" classpath="${main.theClasspath}" debug="true" />
+  </target>
+
+  <target name="test.compile" depends="distBinary" >
+    <mkdir dir="${build.dir.test}" />
+
+    <record name="${test.log}" action="start" append="yes"/>
+    <javac srcdir="${src.dir.test}" destdir="${build.dir.test}" debug="true" source="1.5" target="1.5">
+      <classpath  refid="test.classpath"/>
+      <include name="**/*.java" />
+    </javac>
+    <record name="${test.log}" action="stop"/>
+  </target>
+
+  <target name="test" depends="test.compile">
+    <mkdir dir="${dist.dir.test}" />
+
+    <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="withOutAndErr" showoutput="yes">
+      <jvmarg value="-Dgrouper.allow.db.changes=true"/>
+      <!--jvmarg value="-Dgrouper.home=${grouper.home}"/-->
+      <classpath refid="test.classpath"/>
+      <formatter type="xml"/>
+      <test name="edu.internet2.middleware.grouperVoot.AllVootTests" todir="${dist.dir.test}" />
+    </junit>
   </target>
 
   <target name="jarPrepare" depends="init">

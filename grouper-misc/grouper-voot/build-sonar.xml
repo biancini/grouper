@@ -1,0 +1,34 @@
+<project name="SonarAntProject" default="sonar">
+	<import file="build-properties.xml"/>
+
+	<path id="sonar.classpath">
+		<fileset dir="${buildtools.dir}/sonar" includes="**/*.jar" />
+ 	</path>
+
+	<taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+    		<classpath refid="sonar.classpath" />
+  	</taskdef>
+
+	<property name="build.version" value="2.2.1"/>
+  	<property name="mysonar.organizationName" value="it.garr"/>
+   	<property name="sonar.projectName" value="Grouper VOOT connector" />
+	<property name='sonar.surefire.reportsPath' value='${junit.report.xml}'/>
+	<property name="sonar.core.codeCoveragePlugin" value="emma"/>
+	<property name='sonar.emma.reportPath' value='${emma.outdir}'/>
+
+  	<target name="sonar" depends="clean, compile, compile-test, test">
+		<property name="sonar.jdbc.url" value="jdbc:mysql://sonarqube.mib.garr.it:3306/sonar?useUnicode=true&amp;characterEncoding=utf8" />
+		<property name="sonar.jdbc.driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="sonar.jdbc.username" value="sonar" />
+		<property name="sonar.jdbc.password" value="sonar" />
+		<property name="sonar.host.url" value="http://sonarqube.mib.garr.it:9000" />
+
+		<sonar:sonar key="${mysonar.organizationName}:${sonar.projectName}" version="${build.version}" xmlns:sonar="antlib:org.sonar.ant">
+			<sources>
+				<path location="${project.dir}/src"/>
+			</sources>
+			<tests>
+	    			<path location="${project.dir}/test"/>
+		    	</tests>
+ 	</target>
+</project>
