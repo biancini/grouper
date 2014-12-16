@@ -16,7 +16,7 @@
 	<property name="sonar.core.codeCoveragePlugin" value="emma"/>
 	<property name='sonar.emma.reportPath' value='${emma.outdir}'/>
 
-  	<target name="sonar" depends="clean, compile, compile-test, test">
+  	<target name="sonar" depends="clean, compile, test.compile, test">
 		<property name="sonar.jdbc.url" value="jdbc:mysql://sonarqube.mib.garr.it:3306/sonar?useUnicode=true&amp;characterEncoding=utf8" />
 		<property name="sonar.jdbc.driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="sonar.jdbc.username" value="sonar" />
@@ -30,5 +30,6 @@
 			<tests>
 	    			<path location="${project.dir}/test"/>
 		    	</tests>
+		</sonar:sonar>
  	</target>
 </project>

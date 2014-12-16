@@ -16,7 +16,6 @@
 
 package edu.internet2.middleware.grouperVoot.messages;
 
-import edu.internet2.middleware.grouper.util.GrouperUtil;
 
 /**
  * Bean to respresent a valid VOOT response.

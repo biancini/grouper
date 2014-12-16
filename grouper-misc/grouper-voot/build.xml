@@ -173,5 +173,6 @@
     </tar>            
   </target>
 
+  <import file="build-sonar.xml"/>
   
 </project>
