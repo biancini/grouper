@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 

@@ -26,7 +26,7 @@ To run Grouper Voot
   <servlet>
     <servlet-name>VootServlet</servlet-name>
     <display-name>Voot Servlet</display-name>
-    <servlet-class>edu.internet2.middleware.grouperVoot.VootServlet</servlet-class>
+    <servlet-class>edu.internet2.middleware.groupervoot.VootServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 

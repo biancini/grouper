@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

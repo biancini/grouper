@@ -18,7 +18,7 @@
  * @author mchyzer
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import junit.textui.TestRunner;
 import edu.internet2.middleware.grouper.Group;

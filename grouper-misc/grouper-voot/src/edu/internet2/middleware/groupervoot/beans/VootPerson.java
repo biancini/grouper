@@ -14,9 +14,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.beans;
+package edu.internet2.middleware.groupervoot.beans;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -90,23 +91,41 @@ public class VootPerson {
   public boolean equals(Object otherVootPerson) {
     if (otherVootPerson instanceof VootPerson) {
       VootPerson other = (VootPerson) otherVootPerson;
-      if (!other.getVoot_membership_role().equals(voot_membership_role)) return false;
-      if (!other.getId().equals(id)) return false;
-      if (!other.getDisplayName().equals(displayName)) return false;
+      if (!other.getVoot_membership_role().equals(voot_membership_role)) {
+        return false;
+      }
+      if (!other.getId().equals(id)) {
+        return false;
+      }
+      if (!other.getDisplayName().equals(displayName)) {
+        return false;
+      }
       
       List<VootEmail> mailList1 = Arrays.asList(emails);
       List<VootEmail> mailList2 = Arrays.asList(other.getEmails());
-      if (!mailList1.containsAll(mailList2) || !mailList2.containsAll(mailList1)) return false;
+      if (!mailList1.containsAll(mailList2) || !mailList2.containsAll(mailList1)) {
+        return false;
+      }
 
       //List<VootAttribute> attributeList1 = Arrays.asList(attributes);
       //List<VootAttribute> attributeList2 = Arrays.asList(other.getAttributes());
-      //if (!attributeList1.containsAll(attributeList2) || !attributeList2.containsAll(attributeList1)) return false;
+      //if (!attributeList1.containsAll(attributeList2) || !attributeList2.containsAll(attributeList1)) {
+      //  return false;
+      //}
       
       return true;
-    }
-    else {
+    } else {
       return false;
     }
+  }
+  
+  /**
+   * Method to generate an hash code for the current object.
+   * @return the hash code
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id, this.displayName, this.emails, this.voot_membership_role);
   }
 
   /**

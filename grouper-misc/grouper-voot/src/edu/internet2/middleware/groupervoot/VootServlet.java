@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -37,8 +37,8 @@ import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouper.util.JsonIndenter;
 import edu.internet2.middleware.grouper.ws.GrouperServiceJ2ee;
 import edu.internet2.middleware.grouper.ws.util.GrouperServiceUtils;
-import edu.internet2.middleware.grouperVoot.messages.VootErrorResponse;
-import edu.internet2.middleware.grouperVoot.restLogic.VootWsRest;
+import edu.internet2.middleware.groupervoot.messages.VootErrorResponse;
+import edu.internet2.middleware.groupervoot.restLogic.VootWsRest;
 import edu.internet2.middleware.subject.Subject;
 
 /**

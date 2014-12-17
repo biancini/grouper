@@ -18,7 +18,7 @@
  * @author mchyzer
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +36,9 @@ import edu.internet2.middleware.grouper.attr.AttributeDefType;
 import edu.internet2.middleware.grouper.attr.AttributeDefValueType;
 import edu.internet2.middleware.grouper.helper.SubjectTestHelper;
 import edu.internet2.middleware.grouper.privs.AccessPrivilege;
-import edu.internet2.middleware.grouperVoot.beans.VootPerson;
-import edu.internet2.middleware.grouperVoot.messages.VootGetGroupsResponse;
-import edu.internet2.middleware.grouperVoot.messages.VootGetMembersResponse;
+import edu.internet2.middleware.groupervoot.beans.VootPerson;
+import edu.internet2.middleware.groupervoot.messages.VootGetGroupsResponse;
+import edu.internet2.middleware.groupervoot.messages.VootGetMembersResponse;
 import edu.internet2.middleware.subject.Subject;
 
 /**

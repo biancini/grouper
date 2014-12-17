@@ -14,57 +14,62 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.messages;
+package edu.internet2.middleware.groupervoot.messages;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
-import edu.internet2.middleware.grouperVoot.beans.VootGroup;
+import edu.internet2.middleware.groupervoot.beans.VootPerson;
 
 /**
- * Response for get groups request.
+ * Response to get members request.
  * 
  * @author mchyzer
- * @author Andrea Biancini <andrea.biancin@gmail.com>
+ * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-public class VootGetGroupsResponse extends VootResponse {
+public class VootGetMembersResponse extends VootResponse {
+  
+  private static final Log LOG = LogFactory.getLog(VootGetMembersResponse.class);
 
   /** result body */
-  private VootGroup[] entry;
+  private VootPerson[] entry;
 
   /**
-   * Get the results as array of VOOT groups.
+   * Get the results as array of VOOT persons.
    * 
-   * @return the results as array of VOOT groups.
+   * @return the results as array of VOOT persons.
    */
-  public VootGroup[] getEntry() {
+  public VootPerson[] getEntry() {
     return this.entry;
   }
 
   /**
-   * Set the results passing an array of VOOT groups.
+   * Set the results passing an array of VOOT persons.
    * 
-   * @param entry1 the array of VOOT groups.
+   * @param entry1 the array of VOOT persons.
    */
-  public void setEntry(VootGroup[] entry1) {
+  public void setEntry(VootPerson[] entry1) {
     this.entry = entry1;
   }
 
   /**
-   * Set the results by taking a slice of the elements in an array of VOOT groups.
+   * Set the results by taking a slice of the elements in an array of VOOT persons.
    * 
-   * @param entry1 the array of VOOT groups.
+   * @param entry1 the array of VOOT persons.
    * @param start the first element in the result set (0 means start from beginning).
    * @param count the number of elements in the result set (-1 or 0 means find all).
    */
-  public void setEntry(VootGroup[] entry1, int start, int count) {
+  public void setEntry(VootPerson[] entry1, int start, int count) {
     int remaining = count;
     if (remaining < 0 || (entry1.length - start) < count) {
       remaining = entry1.length - start;
     }
 
-    VootGroup[] pageArray = new VootGroup[remaining];
+    VootPerson[] pageArray = new VootPerson[remaining];
     for (int i = 0; i < remaining; ++i) {
       pageArray[i] = entry1[i + start];
     }
@@ -73,29 +78,30 @@ public class VootGetGroupsResponse extends VootResponse {
   }
 
   /**
-   * Method that sorts one array of VOOT groups.
+   * Method that sorts one array of VOOT persons.
    * 
    * @param entries the array to sort.
    * @param sortBy the field name to be used for sorting or null of no sorting.
    * @return the sorted array.
    */
-  public static VootGroup[] sort(VootGroup[] entries, final String sortBy) {
+  public static VootPerson[] sort(VootPerson[] entries, final String sortBy) {
     if (sortBy != null) {
-      Arrays.sort(entries, new Comparator<VootGroup>() {
+      Arrays.sort(entries, new Comparator<VootPerson>() {
         @Override
-        public int compare(VootGroup group1, VootGroup group2) {
+        public int compare(VootPerson person1, VootPerson person2) {
           try {
             // Set up introspection for the field specified by sortBy
-            Field f = VootGroup.class.getDeclaredField(sortBy);
+            Field f = VootPerson.class.getDeclaredField(sortBy);
             f.setAccessible(true);
 
             // Retrieve String value for the field obtained by introspection
-            String value1 = f.get(group1).toString();
-            String value2 = f.get(group2).toString();
+            String value1 = f.get(person1).toString();
+            String value2 = f.get(person2).toString();
 
             // Compare the two strings
             return value1.compareTo(value2);
           } catch (Exception e) {
+            LOG.warn(e);
             // If any exception return 0 not to influence original sorting.
             return 0;
           }

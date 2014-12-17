@@ -14,8 +14,9 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.beans;
+package edu.internet2.middleware.groupervoot.beans;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,7 +63,7 @@ public class VootGroup {
     this.setName(group.getDisplayName());
     this.setDescription(group.getDescription());
     
-    if (group.getAttributeDelegate().getAttributeAssigns().size() > 0) {
+    if (!group.getAttributeDelegate().getAttributeAssigns().isEmpty()) {
       attributes = new VootAttribute[group.getAttributeDelegate().getAttributeAssigns().size()];
       int i = 0;
       
@@ -89,15 +90,32 @@ public class VootGroup {
   public boolean equals(Object otherVootGroup) {
     if (otherVootGroup instanceof VootGroup) {
       VootGroup other = (VootGroup) otherVootGroup;
-      if (!other.getId().equals(id)) return false;
-      if (!other.getName().equals(name)) return false;
-      if (!other.getDescription().equals(description)) return false;
+      if (!other.getId().equals(id)) {
+        return false;
+      }
+      if (!other.getName().equals(name)) {
+        return false;
+      }
+      if (!other.getDescription().equals(description)) {
+        return false;
+      }
       if (other.getVoot_membership_role() != null)
-        if (!other.getVoot_membership_role().equals(voot_membership_role)) return false;
+        if (!other.getVoot_membership_role().equals(voot_membership_role)) {
+          return false;
+        }
       
       return true;
     }
     return false;
+  }
+  
+  /**
+   * Method to generate an hash code for the current object.
+   * @return the hash code
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id, this.name, this.description, this.voot_membership_role);
   }
 
   /**

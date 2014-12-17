@@ -117,7 +117,7 @@
         <jvmarg value="-Dgrouper.allow.db.changes=true"/>
         <classpath refid="test.classpath"/>
         <formatter type="xml"/>
-        <test name="edu.internet2.middleware.grouperVoot.AllVootTests" todir="${build.dir.test}" />
+        <test name="edu.internet2.middleware.groupervoot.AllVootTests" todir="${build.dir.test}" />
       </junit>
     </jacoco:coverage>
   </target>

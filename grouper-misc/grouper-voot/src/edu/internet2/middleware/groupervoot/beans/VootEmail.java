@@ -14,7 +14,9 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.beans;
+package edu.internet2.middleware.groupervoot.beans;
+
+import java.util.Objects;
 
 /**
  * Class representing VOOT email field in the object representing a person.
@@ -36,15 +38,29 @@ public class VootEmail {
   public boolean equals(Object otherVootEmail) {
     if (otherVootEmail instanceof VootEmail) {
       VootEmail other = (VootEmail) otherVootEmail;
-      if (!other.getType().equals(type)) return false;
-      if (!other.getValue().equals(value)) return false;
+      if (!other.getType().equals(type)) {
+        return false;
+      }
+      if (!other.getValue().equals(value)) {
+        return false;
+      }
       
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
+  
+  /**
+   * Method to generate an hash code for the current object.
+   * @return the hash code
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.type, this.value);
+  }
+
+
 
   /**
    * Type of email. Should be a value between "home", "work", "other". e.g. 'work'

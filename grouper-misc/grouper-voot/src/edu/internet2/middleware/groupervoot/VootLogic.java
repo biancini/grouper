@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,11 +55,11 @@ import edu.internet2.middleware.grouper.misc.E;
 import edu.internet2.middleware.grouper.privs.AccessPrivilege;
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouperClientExt.org.apache.commons.lang3.StringUtils;
-import edu.internet2.middleware.grouperVoot.beans.VootAttribute;
-import edu.internet2.middleware.grouperVoot.beans.VootGroup;
-import edu.internet2.middleware.grouperVoot.beans.VootPerson;
-import edu.internet2.middleware.grouperVoot.messages.VootGetGroupsResponse;
-import edu.internet2.middleware.grouperVoot.messages.VootGetMembersResponse;
+import edu.internet2.middleware.groupervoot.beans.VootAttribute;
+import edu.internet2.middleware.groupervoot.beans.VootGroup;
+import edu.internet2.middleware.groupervoot.beans.VootPerson;
+import edu.internet2.middleware.groupervoot.messages.VootGetGroupsResponse;
+import edu.internet2.middleware.groupervoot.messages.VootGetMembersResponse;
 import edu.internet2.middleware.subject.Subject;
 
 /**
@@ -69,6 +69,10 @@ import edu.internet2.middleware.subject.Subject;
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
 public class VootLogic {
+  private VootLogic() {
+    // Do nothing
+  }
+  
   /**
    * Helper for find by approximate name queries.
    * This isn't in 2.0.0.
@@ -110,7 +114,9 @@ public class VootLogic {
             }
 
             if (alternateNames) {
-              if (currentNames) hql.append(" or ");
+              if (currentNames) {
+                hql.append(" or ");
+              }
               hql.append(" theGroup.alternateNameDb like :theAlternateName ");
               byHqlStatic.setString("theAlternateName", "%" + lowerName + "%");
             }
@@ -150,7 +156,9 @@ public class VootLogic {
    * @param hqlQuery object to append the stored params to
    */
   private static void appendHqlQuery(String groupAlias, Set<TypeOfGroup> typeOfGroups, StringBuilder hql, HqlQuery hqlQuery) {
-    if (GrouperUtil.length(typeOfGroups) <= 0) return;
+    if (GrouperUtil.length(typeOfGroups) <= 0) {
+      return;
+    }
     
     hql.append((hql.indexOf(" where ") > 0) ? " and ": " where ");
     hql.append(groupAlias).append(".typeOfGroupDb in ( ");
@@ -197,7 +205,7 @@ public class VootLogic {
       AttributeAssignMembershipDelegate membershipAttributeDelegate =  membership.getAttributeDelegate();
       AttributeValueDelegate attributeValueDelegate = membership.getAttributeValueDelegate();
       
-      if (membershipAttributeDelegate.getAttributeAssigns().size() > 0) {
+      if (!membershipAttributeDelegate.getAttributeAssigns().isEmpty()) {
         MultiKey memberMultiKey = new MultiKey(member.getSubject().getSourceId(), member.getSubject().getId());
         
         Map<String, String[]> attributes = new HashMap<String, String[]>();
@@ -233,22 +241,25 @@ public class VootLogic {
 
     boolean subjectInGroup = false;
     for (Subject curSubject : memberSubjects) {
-      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId()))
+      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId())) {
         subjectInGroup = true;
+      }
       MultiKey subjectMultiKey = new MultiKey(curSubject.getSourceId(), curSubject.getId());
       multiKeyToSubject.put(subjectMultiKey, curSubject);
       memberToRole.put(subjectMultiKey, VootGroup.GroupRoles.MEMBER.toString());
     }
     for (Subject curSubject : updaters) {
-      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId()))
+      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId())) {
         subjectInGroup = true;
+      }
       MultiKey subjectMultiKey = new MultiKey(subject.getSourceId(), curSubject.getId());
       multiKeyToSubject.put(subjectMultiKey, curSubject);
       memberToRole.put(subjectMultiKey, VootGroup.GroupRoles.MANAGER.toString());
     }
     for (Subject curSubject : admins) {
-      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId()))
+      if (curSubject.getSourceId().equals(subject.getSourceId()) && curSubject.getId().equals(subject.getId())) {
         subjectInGroup = true;
+      }
       MultiKey subjectMultiKey = new MultiKey(curSubject.getSourceId(), curSubject.getId());
       multiKeyToSubject.put(subjectMultiKey, curSubject);
       memberToRole.put(subjectMultiKey, VootGroup.GroupRoles.ADMIN.toString());
@@ -268,7 +279,7 @@ public class VootLogic {
       String role = memberToRole.get(multiKey);
       VootPerson vootPerson = new VootPerson(curSubject);
       vootPerson.setVoot_membership_role(role);
-      if (memberAttributes.get(multiKey) != null){
+      if (memberAttributes.get(multiKey) != null) {
         VootAttribute[] attributes = new VootAttribute[memberAttributes.get(multiKey).size()];
         for (int i = 0; i < memberAttributes.get(multiKey).size(); ++i) {
           String curKey = memberAttributes.get(multiKey).keySet().toArray(new String[0])[i];
@@ -335,7 +346,7 @@ public class VootLogic {
       groupToRole.put(group, VootGroup.GroupRoles.ADMIN.toString());
     }
     
-    if (groupToRole.size() == 0) {
+    if (groupToRole.isEmpty()) {
       vootGetGroupsResponse.paginate(null, start, count);
       return vootGetGroupsResponse;
     }

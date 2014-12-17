@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.messages;
+package edu.internet2.middleware.groupervoot.messages;
 
 
 /**
@@ -52,8 +52,7 @@ public abstract class VootResponse {
       if (count > 0) {
         //note Integer.min is in Java7, so lets use Math.min so Java6 will work
         this.itemsPerPage = Math.min(count, resultArray.length - start);
-      }
-      else {
+      } else {
         this.itemsPerPage = resultArray.length;
       }
     }

@@ -18,10 +18,12 @@
  * @author mchyzer $Id: GrouperWsRestGet.java,v 1.9 2009-12-29 07:39:28 mchyzer Exp $
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-package edu.internet2.middleware.grouperVoot.restLogic;
+package edu.internet2.middleware.groupervoot.restLogic;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.LogFactory;
 
 import edu.internet2.middleware.grouper.GrouperSession;
 import edu.internet2.middleware.grouper.SubjectFinder;
@@ -30,10 +32,10 @@ import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouper.ws.rest.GrouperRestInvalidRequest;
 import edu.internet2.middleware.grouper.ws.util.GrouperServiceUtils;
 import edu.internet2.middleware.grouperClientExt.org.apache.commons.lang3.StringUtils;
-import edu.internet2.middleware.grouperVoot.VootLogic;
-import edu.internet2.middleware.grouperVoot.VootRestHttpMethod;
-import edu.internet2.middleware.grouperVoot.beans.VootGroup;
-import edu.internet2.middleware.grouperVoot.messages.VootErrorResponse;
+import edu.internet2.middleware.groupervoot.VootLogic;
+import edu.internet2.middleware.groupervoot.VootRestHttpMethod;
+import edu.internet2.middleware.groupervoot.beans.VootGroup;
+import edu.internet2.middleware.groupervoot.messages.VootErrorResponse;
 import edu.internet2.middleware.subject.SubjectNotFoundException;
 import edu.internet2.middleware.subject.SubjectNotUniqueException;
 
@@ -41,10 +43,9 @@ import edu.internet2.middleware.subject.SubjectNotUniqueException;
  * All first level resources on a get request.
  */
 public enum VootWsRest {
-
+  
   /** group get requests */
   groups {
-
     /**
      * Handle the incoming request based on url.
      * 
@@ -85,9 +86,11 @@ public enum VootWsRest {
         try {
           return VootLogic.getGroups(SubjectFinder.findById(userName, true), sortBy, start, count);
         } catch (SubjectNotFoundException e) {
+          LogFactory.getLog(VootWsRest.class).warn(e);
           return new VootErrorResponse("Subject error",
               "Subject not found: " + userName + ", " + GrouperUtil.toStringForLog(urlStrings));
         } catch (SubjectNotUniqueException e) {
+          LogFactory.getLog(VootWsRest.class).warn(e);
           return new VootErrorResponse("Subject error",
               "Subject not unique: " + userName + ", " + GrouperUtil.toStringForLog(urlStrings));
         }
@@ -97,7 +100,7 @@ public enum VootWsRest {
 
   /** people get requests */
   people {
-
+    
     /**
      * Handle the incoming request based on url.
      * 
@@ -149,12 +152,15 @@ public enum VootWsRest {
           return VootLogic.getMembers(SubjectFinder.findById(personId, true), vootGroup, sortBy, start, count);
         }
       } catch (SubjectNotFoundException e) {
+        LogFactory.getLog(VootWsRest.class).warn(e);
         return new VootErrorResponse("Subject error",
             "Subject not found: " + personId + ", " + GrouperUtil.toStringForLog(urlStrings));
       } catch (SubjectNotUniqueException e) {
+        LogFactory.getLog(VootWsRest.class).warn(e);
         return new VootErrorResponse("Subject error",
             "Subject not unique: " + personId + ", " + GrouperUtil.toStringForLog(urlStrings));
       } catch (GroupNotFoundException e) {
+        LogFactory.getLog(VootWsRest.class).warn(e);
         return new VootErrorResponse("Group not found", e.getMessage());
       }
     }
@@ -241,7 +247,9 @@ public enum VootWsRest {
   
       return GrouperUtil.enumValueOfIgnoreCase(VootWsRest.class, string, exceptionOnNotFound);
     } catch (RuntimeException e) {
-      if (exceptionOnNotFound) throw e;
+      if (exceptionOnNotFound) {
+        throw e;
+      }
       return GrouperUtil.enumValueOfIgnoreCase(VootWsRest.class, VOOT_BLANK.name(), exceptionOnNotFound);
     }
   }

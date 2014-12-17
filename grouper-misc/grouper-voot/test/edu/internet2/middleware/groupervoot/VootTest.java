@@ -18,7 +18,7 @@
  * @author mchyzer
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -30,13 +30,14 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.internet2.middleware.grouper.helper.GrouperTest;
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouper.ws.util.GrouperServiceUtils;
-import edu.internet2.middleware.grouperVoot.beans.VootAttribute;
-import edu.internet2.middleware.grouperVoot.beans.VootGroup;
-import edu.internet2.middleware.grouperVoot.beans.VootPerson;
-import edu.internet2.middleware.grouperVoot.messages.VootErrorResponse;
-import edu.internet2.middleware.grouperVoot.messages.VootGetGroupsResponse;
-import edu.internet2.middleware.grouperVoot.messages.VootGetMembersResponse;
-import edu.internet2.middleware.grouperVoot.restLogic.VootWsRest;
+import edu.internet2.middleware.groupervoot.VootRestHttpMethod;
+import edu.internet2.middleware.groupervoot.beans.VootAttribute;
+import edu.internet2.middleware.groupervoot.beans.VootGroup;
+import edu.internet2.middleware.groupervoot.beans.VootPerson;
+import edu.internet2.middleware.groupervoot.messages.VootErrorResponse;
+import edu.internet2.middleware.groupervoot.messages.VootGetGroupsResponse;
+import edu.internet2.middleware.groupervoot.messages.VootGetMembersResponse;
+import edu.internet2.middleware.groupervoot.restLogic.VootWsRest;
 import edu.internet2.middleware.subject.Subject;
 
 /**

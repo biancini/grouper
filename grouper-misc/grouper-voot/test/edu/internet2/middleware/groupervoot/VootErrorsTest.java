@@ -18,7 +18,7 @@
  * @author mchyzer
  * @author Andrea Biancini <andrea.biancini@gmail.com>
  */
-package edu.internet2.middleware.grouperVoot;
+package edu.internet2.middleware.groupervoot;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,8 @@ import edu.internet2.middleware.grouper.helper.SubjectTestHelper;
 import edu.internet2.middleware.grouper.privs.AccessPrivilege;
 import edu.internet2.middleware.grouper.util.GrouperUtil;
 import edu.internet2.middleware.grouper.ws.util.GrouperServiceUtils;
-import edu.internet2.middleware.grouperVoot.restLogic.VootWsRest;
+import edu.internet2.middleware.groupervoot.VootRestHttpMethod;
+import edu.internet2.middleware.groupervoot.restLogic.VootWsRest;
 import edu.internet2.middleware.subject.Subject;
 
 /**

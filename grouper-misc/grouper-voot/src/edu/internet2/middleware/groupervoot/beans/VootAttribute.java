@@ -14,7 +14,9 @@
  * limitations under the License.
  ******************************************************************************/
 
-package edu.internet2.middleware.grouperVoot.beans;
+package edu.internet2.middleware.groupervoot.beans;
+
+import java.util.Objects;
 
 /**
  * Class representing VOOT additional attributes field in the object representing a person.
@@ -35,20 +37,38 @@ public class VootAttribute {
   public boolean equals(Object otherVootAttribute) {
     if (otherVootAttribute instanceof VootAttribute) {
       VootAttribute other = (VootAttribute) otherVootAttribute;
-      if (!other.getName().equals(name)) return false;
+      if (!other.getName().equals(name)) {
+        return false;
+      }
       
-      if (values == null && other.getValues() != null) return false;
-      if (values != null && other.getValues() == null) return false;
-      if (values.length != other.getValues().length) return false;
+      if (values == null && other.getValues() != null) {
+        return false;
+      }
+      if (values != null && other.getValues() == null) {
+        return false;
+      }
+      if (values.length != other.getValues().length) {
+        return false;
+      }
       for (int i = 0; i < values.length; ++i) {
-        if (!values[i].equals(other.getValues()[i])) return false;
+        if (!values[i].equals(other.getValues()[i])) {
+          return false;
+        }
       }
       
       return true;
-    }
-    else {
+    } else {
       return false;
     }
+  }
+  
+  /**
+   * Method to generate an hash code for the current object.
+   * @return the hash code
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.name, this.values);
   }
 
   /**
