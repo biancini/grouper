@@ -1,8 +1,6 @@
 <project name="SonarAntProject" default="sonar">
-	<import file="build-properties.xml"/>
-
 	<path id="sonar.classpath">
-		<fileset dir="${buildtools.dir}/sonar" includes="**/*.jar" />
+		<fileset dir="${buildtools.dir}" includes="**/*.jar" />
  	</path>
 
 	<taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
@@ -11,24 +9,27 @@
 
 	<property name="build.version" value="2.2.1"/>
   	<property name="mysonar.organizationName" value="it.garr"/>
-   	<property name="sonar.projectName" value="Grouper VOOT connector" />
-	<property name='sonar.surefire.reportsPath' value='${junit.report.xml}'/>
-	<property name="sonar.core.codeCoveragePlugin" value="emma"/>
-	<property name='sonar.emma.reportPath' value='${emma.outdir}'/>
+   	<property name="sonar.java.binaries" value="${dist.dir}/bin" />
+   	<property name="sonar.binaries" value="${dist.dir}/bin" />
+   	<property name="sonar.projectName" value="Grouper" />
+	<property name="sonar.surefire.reportsPath" value="${build.dir.test}"/>
+	<property name="sonar.junit.reportsPath" value="${build.dir.test}"/>
+	<property name="sonar.core.codeCoveragePlugin" value="jacoco"/>
+	<property name="sonar.jacoco.reportPath" value="${build.dir.test}/jacoco.exec" />
 
   	<target name="sonar" depends="clean, compile, test.compile, test">
 		<property name="sonar.jdbc.url" value="jdbc:mysql://sonarqube.mib.garr.it:3306/sonar?useUnicode=true&amp;characterEncoding=utf8" />
 		<property name="sonar.jdbc.driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="sonar.jdbc.username" value="sonar" />
 		<property name="sonar.jdbc.password" value="sonar" />
-		<property name="sonar.host.url" value="http://sonarqube.mib.garr.it:9000" />
+		<property name="sonar.host.url" value="http://sonarqube.mib.garr.it" />
 
 		<sonar:sonar key="${mysonar.organizationName}:${sonar.projectName}" version="${build.version}" xmlns:sonar="antlib:org.sonar.ant">
 			<sources>
-				<path location="${project.dir}/src"/>
+				<path location="${src.dir}"/>
 			</sources>
 			<tests>
-	    			<path location="${project.dir}/test"/>
+	    			<path location="${src.dir.test}"/>
 		    	</tests>
 		</sonar:sonar>
  	</target>

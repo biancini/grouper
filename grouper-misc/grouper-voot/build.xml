@@ -1,5 +1,7 @@
-
-<project name="grouperVoot" default="build" basedir=".">
+<project name="grouperVoot" default="build" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    <classpath path="${basedir}/sonar/jacocoant.jar"/>
+  </taskdef>
 
   <!-- ant contrib allows conditionals in ant scripts -->
   <taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -20,7 +22,7 @@
   
   <available file="build.properties" property="build.properties.exists" value="true"/>
 
-  <fail message="Couldnt detect build.properties file, copy the build.example.properties to build.properties in the project base dir, and customize" unless="build.properties.exists" />
+  <fail message="Couldn't detect build.properties file, copy the build.example.properties to build.properties in the project base dir, and customize" unless="build.properties.exists" />
   <property file="build.properties" />
   
   <target name="build" description="full build" depends="init,clean,compile,jarPrepare,jar">
@@ -55,16 +57,18 @@
       </fileset>
     </path>
 
-    <path id="project.classpath">
+    <path id="test.classpath">
+      <path refid="main.classpath"/>
       <fileset dir="${basedir}/dist">
         <include name="**/*.jar" />
       </fileset>
-    </path>
-
-    <path id="test.classpath">
-      <path refid="main.classpath"/>
-      <path refid="project.classpath"/>
+      <fileset dir="${grouper.dir}/lib/jdbcSamples">
+        <include name="**/*.jar" />
+      </fileset>
       <fileset dir="${grouper.dir}/dist/lib/test">
+        <include name="**/*.jar" />
+      </fileset>
+      <fileset dir="${buildtools.dir}">
         <include name="**/*.jar" />
       </fileset>
       <pathelement location="${grouper.dir}/conf"/>
@@ -81,14 +85,12 @@
 
     <pathconvert targetos="${main.os}" property="main.theClasspath" refid="main.classpath" />
     <pathconvert targetos="${main.os}" property="test.theClasspath" refid="test.classpath" />
-    
   </target>
 
   <target name="clean" depends="init">
     <mkdir dir="${main.binDir}" />
     <delete dir="${main.binDir}" />
     <mkdir dir="${main.binDir}" />
-
   </target> 
   
   <target name="compile" depends="init">
@@ -102,24 +104,22 @@
   <target name="test.compile" depends="distBinary" >
     <mkdir dir="${build.dir.test}" />
 
-    <record name="${test.log}" action="start" append="yes"/>
     <javac srcdir="${src.dir.test}" destdir="${build.dir.test}" debug="true" source="1.5" target="1.5">
       <classpath  refid="test.classpath"/>
       <include name="**/*.java" />
     </javac>
-    <record name="${test.log}" action="stop"/>
   </target>
 
   <target name="test" depends="test.compile">
-    <mkdir dir="${dist.dir.test}" />
-
-    <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="withOutAndErr" showoutput="yes">
-      <jvmarg value="-Dgrouper.allow.db.changes=true"/>
-      <!--jvmarg value="-Dgrouper.home=${grouper.home}"/-->
-      <classpath refid="test.classpath"/>
-      <formatter type="xml"/>
-      <test name="edu.internet2.middleware.grouperVoot.AllVootTests" todir="${dist.dir.test}" />
-    </junit>
+    <jacoco:coverage destfile="${build.dir.test}/jacoco.exec">
+      <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="withOutAndErr" showoutput="yes">
+        <jvmarg value="-XX:-UseSplitVerifier"/>
+        <jvmarg value="-Dgrouper.allow.db.changes=true"/>
+        <classpath refid="test.classpath"/>
+        <formatter type="xml"/>
+        <test name="edu.internet2.middleware.grouperVoot.AllVootTests" todir="${build.dir.test}" />
+      </junit>
+    </jacoco:coverage>
   </target>
 
   <target name="jarPrepare" depends="init">
@@ -127,9 +127,9 @@
 
     <copy todir="${main.binDir}">
       <fileset dir="${main.sourceDir}">
-        <include name="**/*.java"/>      <!-- source -->
+        <include name="**/*.java"/>     <!-- source -->
         <include name="**/*.txt"/>      <!-- txt -->
-        <include name="**/*.html"/>      <!-- html -->
+        <include name="**/*.html"/>     <!-- html -->
       </fileset>
     </copy>
   </target>
